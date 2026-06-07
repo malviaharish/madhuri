@@ -9,6 +9,14 @@ import datetime
 from openpyxl import load_workbook
 from playwright.sync_api import sync_playwright
 
+# App layout & theme configuration (Must be the first Streamlit command)
+st.set_page_config(
+    page_title="Capture Studio — Search & Export Tool",
+    page_icon="📸",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 # Auto-install Playwright browser if running in a cloud environment
 try:
     import subprocess
@@ -18,15 +26,6 @@ try:
     install_playwright_browsers()
 except Exception as e:
     pass
-
-# App layout & theme configuration
-st.set_page_config(
-
-    page_title="Capture Studio — Search & Export Tool",
-    page_icon="📸",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Initialize Session States
 if "terms" not in st.session_state:
