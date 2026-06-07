@@ -9,8 +9,19 @@ import datetime
 from openpyxl import load_workbook
 from playwright.sync_api import sync_playwright
 
+# Auto-install Playwright browser if running in a cloud environment
+try:
+    import subprocess
+    @st.cache_resource
+    def install_playwright_browsers():
+        subprocess.run(["playwright", "install", "chromium"], check=True)
+    install_playwright_browsers()
+except Exception as e:
+    pass
+
 # App layout & theme configuration
 st.set_page_config(
+
     page_title="Capture Studio — Search & Export Tool",
     page_icon="📸",
     layout="wide",
@@ -88,7 +99,8 @@ st.markdown("""
     <h1 style="color:white; margin:0;">📸 Capture Studio — Search & Export</h1>
     <p style="color:#a3a3c2; margin:5px 0 0 0;">Batch screenshot and PDF exporter for detailed web audits powered by Playwright.</p>
 </div>
-""", unsafe_allow_code=True)
+""", unsafe_allow_html=True)
+
 
 # Layout Setup
 col_left, col_right = st.columns([1, 2])
