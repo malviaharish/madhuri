@@ -8,6 +8,8 @@ import shutil
 import datetime
 from openpyxl import load_workbook
 from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth
+
 
 # 1. Page Config (Must be first)
 st.set_page_config(
@@ -120,9 +122,14 @@ def get_search_url(engine, query, custom_template=None):
         return f"https://www.google.com/search?q={encoded}"
     elif engine == 'scholar':
         return f"https://scholar.google.com/scholar?q={encoded}"
+    elif engine == 'bing':
+        return f"https://www.bing.com/search?q={encoded}"
+    elif engine == 'duckduckgo':
+        return f"https://duckduckgo.com/?q={encoded}"
     elif engine == 'custom' and custom_template:
         return custom_template.replace("{query}", encoded)
     return f"https://pmc.ncbi.nlm.nih.gov/search/?term={encoded}"
+
 
 # Header Styling
 st.markdown("""
@@ -143,7 +150,7 @@ with col_left:
     
     with st.container(border=True):
         st.markdown("**1. Select Engine & Viewport**")
-        engine = st.selectbox("Search Engine", ["pmc", "pubmed", "google", "scholar", "custom"])
+        engine = st.selectbox("Search Engine", ["pmc", "pubmed", "google", "scholar", "bing", "duckduckgo", "custom"])
         custom_url = ""
         if engine == "custom":
             custom_url = st.text_input("Custom URL (use {query} placeholder)", value="https://example.com/search?q={query}")
@@ -155,6 +162,12 @@ with col_left:
             clean_clutter = st.checkbox("Remove page clutter (headers, ads)", value=True)
             dismiss_banners = st.checkbox("Auto-dismiss cookie prompts", value=True)
             delay = st.slider("Render delay (seconds)", min_value=1, max_value=10, value=3)
+            proxy_url = st.text_input(
+                "Proxy Server (Optional)", 
+                key="proxy_url", 
+                help="Specify a proxy to bypass blocks (e.g. http://ip:port or http://user:pass@ip:port)"
+            )
+
 
     st.markdown("---")
     
