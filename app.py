@@ -17,6 +17,146 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Custom CSS Stylesheet for Premium Aesthetics
+st.markdown("""
+<style>
+    /* Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+    /* Global Typography & Font Overrides */
+    html, body, [class*="css"], .stApp {
+        font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.02em !important;
+    }
+
+    /* Glassmorphism sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #0b0c10 !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Style container wrappers to look like glass cards */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        background-color: rgba(255, 255, 255, 0.015) !important;
+        padding: 20px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"]:hover {
+        border-color: rgba(168, 85, 247, 0.25) !important;
+        background-color: rgba(255, 255, 255, 0.025) !important;
+        box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Custom Form & Input Styles */
+    .stTextInput>div>div>input, .stSelectbox>div>div>div {
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(255, 255, 255, 0.02) !important;
+        color: white !important;
+        transition: all 0.25s ease !important;
+    }
+    .stTextInput>div>div>input:focus, .stSelectbox>div>div>div:focus-within {
+        border-color: #a855f7 !important;
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
+    }
+
+    /* Styling Playwright logs box */
+    code, pre {
+        background-color: #06070a !important;
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
+        border-radius: 12px !important;
+        color: #2dd4bf !important; /* Cyber Teal */
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 0.88rem !important;
+        padding: 15px !important;
+    }
+
+    /* Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 10px !important;
+        background-color: transparent !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        margin-bottom: 20px !important;
+    }
+    .stTabs [data-baseweb="tab"] {
+        padding: 10px 20px !important;
+        border-radius: 10px 10px 0 0 !important;
+        background-color: rgba(255, 255, 255, 0.01) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-bottom: none !important;
+        color: rgba(255, 255, 255, 0.5) !important;
+        font-weight: 500 !important;
+        transition: all 0.25s ease !important;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        background-color: rgba(255, 255, 255, 0.04) !important;
+        color: white !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%) !important;
+        border-color: rgba(168, 85, 247, 0.3) !important;
+        color: #e9d5ff !important;
+        border-bottom: 2px solid #a855f7 !important;
+    }
+
+    /* Primary gradient button override */
+    button[kind="primary"] {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+        padding: 12px 28px !important;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    button[kind="primary"]:hover {
+        transform: translateY(-1.5px) !important;
+        box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45) !important;
+    }
+
+    /* Secondary buttons (Clear, deletes, etc.) */
+    button[kind="secondary"] {
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background-color: rgba(255, 255, 255, 0.02) !important;
+        transition: all 0.2s ease !important;
+    }
+    button[kind="secondary"]:hover {
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        background-color: rgba(255, 255, 255, 0.04) !important;
+    }
+
+    /* File uploader container */
+    [data-testid="stFileUploader"] {
+        border: 2px dashed rgba(255, 255, 255, 0.08) !important;
+        background: rgba(255, 255, 255, 0.005) !important;
+        border-radius: 14px !important;
+    }
+
+    /* Image Gallery Cards */
+    .gallery-img-container {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #0f172a;
+        padding: 8px;
+        transition: all 0.3s ease;
+    }
+    .gallery-img-container:hover {
+        transform: translateY(-2px);
+        border-color: rgba(168, 85, 247, 0.3);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Auto-install Playwright browser if running in a cloud environment
 try:
     import subprocess
@@ -92,13 +232,48 @@ def get_search_url(engine, query, custom_template=None):
         return custom_template.replace("{query}", encoded)
     return f"https://pmc.ncbi.nlm.nih.gov/search/?term={encoded}"
 
-# Header Styling
+# Header Styling Redesigned
 st.markdown("""
-<div style="background-color:#1e1e2f; padding:20px; border-radius:10px; margin-bottom:25px; border-left: 5px solid #ff4b4b">
-    <h1 style="color:white; margin:0;">📸 Capture Studio — Search & Export</h1>
-    <p style="color:#a3a3c2; margin:5px 0 0 0;">Batch screenshot and PDF exporter for detailed web audits powered by Playwright.</p>
+<div style="
+    background: linear-gradient(135deg, rgba(15, 17, 26, 0.85) 0%, rgba(26, 27, 44, 0.85) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+">
+    <div style="
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, rgba(99, 102, 241, 0) 70%);
+        border-radius: 50%;
+        filter: blur(20px);
+    "></div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <span style="font-size: 2.6rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));">📸</span>
+        <div>
+            <h1 style="
+                margin: 0;
+                font-size: 2.2rem;
+                background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                letter-spacing: -0.03em;
+            ">Capture Studio</h1>
+            <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.98rem; font-weight: 400;">
+                Batch screenshot and PDF exporter for detailed web audits powered by <span style="color: #c084fc; font-weight: 500;">Playwright</span>.
+            </p>
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 # Layout Setup
@@ -171,7 +346,8 @@ with col_right:
     
     # Run Buttons
     col_run_1, col_run_2 = st.columns([1, 1])
-    start_btn = col_run_1.button("▶️ Start Capture Job", disabled=st.session_state.is_running or not st.session_state.terms, use_container_width=True)
+    start_btn = col_run_1.button("▶️ Start Capture Job", disabled=st.session_state.is_running or not st.session_state.terms, use_container_width=True, type="primary")
+
     
     # Progress Indicators
     progress_bar = st.progress(0)
