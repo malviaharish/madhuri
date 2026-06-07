@@ -9,7 +9,7 @@ import datetime
 from openpyxl import load_workbook
 from playwright.sync_api import sync_playwright
 
-# App layout & theme configuration (Must be the first Streamlit command)
+# 1. Page Config (Must be first)
 st.set_page_config(
     page_title="Capture Studio — Search & Export Tool",
     page_icon="📸",
@@ -17,147 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS Stylesheet for Premium Aesthetics
-st.markdown("""
-<style>
-    /* Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
-
-    /* Global Typography & Font Overrides */
-    html, body, [class*="css"], .stApp {
-        font-family: 'Inter', sans-serif;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Outfit', sans-serif !important;
-        font-weight: 600 !important;
-        letter-spacing: -0.02em !important;
-    }
-
-    /* Glassmorphism sidebar */
-    [data-testid="stSidebar"] {
-        background-color: #0b0c10 !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    /* Style container wrappers to look like glass cards */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius: 16px !important;
-        border: 1px solid rgba(255, 255, 255, 0.06) !important;
-        background-color: rgba(255, 255, 255, 0.015) !important;
-        padding: 20px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"]:hover {
-        border-color: rgba(168, 85, 247, 0.25) !important;
-        background-color: rgba(255, 255, 255, 0.025) !important;
-        box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3) !important;
-    }
-
-    /* Custom Form & Input Styles */
-    .stTextInput>div>div>input, .stSelectbox>div>div>div {
-        border-radius: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        background-color: rgba(255, 255, 255, 0.02) !important;
-        color: white !important;
-        transition: all 0.25s ease !important;
-    }
-    .stTextInput>div>div>input:focus, .stSelectbox>div>div>div:focus-within {
-        border-color: #a855f7 !important;
-        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
-    }
-
-    /* Styling Playwright logs box */
-    code, pre {
-        background-color: #06070a !important;
-        border: 1px solid rgba(255, 255, 255, 0.04) !important;
-        border-radius: 12px !important;
-        color: #2dd4bf !important; /* Cyber Teal */
-        font-family: 'JetBrains Mono', monospace !important;
-        font-size: 0.88rem !important;
-        padding: 15px !important;
-    }
-
-    /* Tabs Styling */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 10px !important;
-        background-color: transparent !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        margin-bottom: 20px !important;
-    }
-    .stTabs [data-baseweb="tab"] {
-        padding: 10px 20px !important;
-        border-radius: 10px 10px 0 0 !important;
-        background-color: rgba(255, 255, 255, 0.01) !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-bottom: none !important;
-        color: rgba(255, 255, 255, 0.5) !important;
-        font-weight: 500 !important;
-        transition: all 0.25s ease !important;
-    }
-    .stTabs [data-baseweb="tab"]:hover {
-        background-color: rgba(255, 255, 255, 0.04) !important;
-        color: white !important;
-    }
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%) !important;
-        border-color: rgba(168, 85, 247, 0.3) !important;
-        color: #e9d5ff !important;
-        border-bottom: 2px solid #a855f7 !important;
-    }
-
-    /* Primary gradient button override */
-    button[kind="primary"] {
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
-        border: none !important;
-        border-radius: 12px !important;
-        color: white !important;
-        font-weight: 600 !important;
-        padding: 12px 28px !important;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-    button[kind="primary"]:hover {
-        transform: translateY(-1.5px) !important;
-        box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45) !important;
-    }
-
-    /* Secondary buttons (Clear, deletes, etc.) */
-    button[kind="secondary"] {
-        border-radius: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        background-color: rgba(255, 255, 255, 0.02) !important;
-        transition: all 0.2s ease !important;
-    }
-    button[kind="secondary"]:hover {
-        border-color: rgba(255, 255, 255, 0.15) !important;
-        background-color: rgba(255, 255, 255, 0.04) !important;
-    }
-
-    /* File uploader container */
-    [data-testid="stFileUploader"] {
-        border: 2px dashed rgba(255, 255, 255, 0.08) !important;
-        background: rgba(255, 255, 255, 0.005) !important;
-        border-radius: 14px !important;
-    }
-
-    /* Image Gallery Cards */
-    .gallery-img-container {
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: #0f172a;
-        padding: 8px;
-        transition: all 0.3s ease;
-    }
-    .gallery-img-container:hover {
-        transform: translateY(-2px);
-        border-color: rgba(168, 85, 247, 0.3);
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Auto-install Playwright browser if running in a cloud environment
+# 2. Playwright Auto-installer (Cached)
 try:
     import subprocess
     @st.cache_resource
@@ -167,9 +27,41 @@ try:
 except Exception as e:
     pass
 
+# 3. Clean CSS styling (Only fonts and button gradients to ensure light/dark mode compatibility)
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+    
+    html, body, [class*="css"], .stApp {
+        font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.02em !important;
+    }
+    
+    /* Clean gradient for primary buttons */
+    button[kind="primary"] {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        color: white !important;
+        font-weight: 600 !important;
+        padding: 10px 24px !important;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+        transition: all 0.3s ease !important;
+    }
+    button[kind="primary"]:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(168, 85, 247, 0.35) !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Initialize Session States
-if "terms" not in st.session_state:
-    st.session_state.terms = ["triclosan suture", "aspirin cardiovascular", "ibuprofen inflammation"]
+if "terms_input" not in st.session_state:
+    st.session_state.terms_input = "triclosan suture\naspirin cardiovascular\nibuprofen inflammation"
 if "logs" not in st.session_state:
     st.session_state.logs = []
 if "outputs" not in st.session_state:
@@ -232,135 +124,119 @@ def get_search_url(engine, query, custom_template=None):
         return custom_template.replace("{query}", encoded)
     return f"https://pmc.ncbi.nlm.nih.gov/search/?term={encoded}"
 
-# Header Styling Redesigned
+# Header Styling
 st.markdown("""
-<div style="
-    background: linear-gradient(135deg, rgba(15, 17, 26, 0.85) 0%, rgba(26, 27, 44, 0.85) 100%);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 30px;
-    border-radius: 20px;
-    margin-bottom: 30px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    position: relative;
-    overflow: hidden;
-">
-    <div style="
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 150px;
-        height: 150px;
-        background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, rgba(99, 102, 241, 0) 70%);
-        border-radius: 50%;
-        filter: blur(20px);
-    "></div>
-    <div style="display: flex; align-items: center; gap: 15px;">
-        <span style="font-size: 2.6rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));">📸</span>
-        <div>
-            <h1 style="
-                margin: 0;
-                font-size: 2.2rem;
-                background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                letter-spacing: -0.03em;
-            ">Capture Studio</h1>
-            <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.98rem; font-weight: 400;">
-                Batch screenshot and PDF exporter for detailed web audits powered by <span style="color: #c084fc; font-weight: 500;">Playwright</span>.
-            </p>
-        </div>
-    </div>
+<div style="background-color:rgba(124, 58, 237, 0.08); border-left: 5px solid #8b5cf6; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+    <h2 style="margin: 0; color:#8b5cf6;">📸 Capture Studio</h2>
+    <p style="margin: 5px 0 0 0; font-size: 0.95rem; opacity: 0.85;">
+        Batch search query screenshot and PDF document exporter powered by Playwright.
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
+# Main 2-Column Layout
+col_left, col_right = st.columns([1, 2], gap="large")
 
-
-# Layout Setup
-col_left, col_right = st.columns([1, 2])
-
-# Sidebar Settings
-st.sidebar.title("⚙️ Control Settings")
-engine = st.sidebar.selectbox("Search Engine", ["pmc", "pubmed", "google", "scholar", "custom"])
-custom_url = ""
-if engine == "custom":
-    custom_url = st.sidebar.text_input("Custom URL Template", value="https://example.com/search?q={query}")
-
-export_format = st.sidebar.selectbox("Export Format", ["screenshot", "screenshot_full", "pdf", "both"])
-viewport = st.sidebar.selectbox("Viewport Size", ["1920x1080", "1280x720", "1536x864", "1024x768"])
-clean_clutter = st.sidebar.checkbox("Remove Clutter (Header/Footer/Banners)", value=True)
-dismiss_banners = st.sidebar.checkbox("Auto-Dismiss Cookie Banners", value=True)
-delay = st.sidebar.slider("Render Delay (seconds)", min_value=1, max_value=10, value=3)
-
-# --- Left Column: Search Terms Management ---
+# --- Left Column: Inputs & Settings ---
 with col_left:
-    st.subheader("📝 Search terms")
+    st.subheader("⚙️ Settings & Inputs")
     
-    # Excel Upload
-    uploaded_file = st.file_uploader("Upload Excel File (.xlsx)", type=["xlsx"])
-    if uploaded_file is not None:
-        try:
-            wb = load_workbook(uploaded_file, read_only=True)
-            sheet = wb.active
-            terms = []
-            for row in sheet.iter_rows(values_only=True):
-                if row and row[0] is not None:
-                    val = str(row[0]).strip()
-                    if val.lower() not in ["search term", "search terms", "query", "term", "queries", ""]:
-                        terms.append(val)
-            wb.close()
-            if terms:
-                st.session_state.terms = terms
-                st.success(f"Loaded {len(terms)} terms from Excel!")
-            else:
-                st.warning("No search terms found in sheet.")
-        except Exception as e:
-            st.error(f"Error parsing Excel file: {e}")
+    with st.container(border=True):
+        st.markdown("**1. Select Engine & Viewport**")
+        engine = st.selectbox("Search Engine", ["pmc", "pubmed", "google", "scholar", "custom"])
+        custom_url = ""
+        if engine == "custom":
+            custom_url = st.text_input("Custom URL (use {query} placeholder)", value="https://example.com/search?q={query}")
+            
+        viewport = st.selectbox("Viewport Size", ["1920x1080", "1280x720", "1536x864", "1024x768"])
+        export_format = st.selectbox("Export Format", ["screenshot", "screenshot_full", "pdf", "both"])
+        
+        with st.expander("Advanced Options", expanded=False):
+            clean_clutter = st.checkbox("Remove page clutter (headers, ads)", value=True)
+            dismiss_banners = st.checkbox("Auto-dismiss cookie prompts", value=True)
+            delay = st.slider("Render delay (seconds)", min_value=1, max_value=10, value=3)
 
-    # Manual input
-    new_term = st.text_input("Add manual term:")
-    if st.button("➕ Add Term") and new_term.strip():
-        st.session_state.terms.append(new_term.strip())
-        st.rerun()
+    st.markdown("---")
+    
+    with st.container(border=True):
+        st.markdown("**2. Input Queries**")
+        
+        # Excel Upload
+        uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
+        if uploaded_file is not None:
+            try:
+                wb = load_workbook(uploaded_file, read_only=True)
+                sheet = wb.active
+                excel_terms = []
+                for row in sheet.iter_rows(values_only=True):
+                    if row and row[0] is not None:
+                        val = str(row[0]).strip()
+                        if val.lower() not in ["search term", "search terms", "query", "term", "queries", ""]:
+                            excel_terms.append(val)
+                wb.close()
+                if excel_terms:
+                    st.session_state.terms_input = "\n".join(excel_terms)
+                    st.success(f"✓ Loaded {len(excel_terms)} queries from Excel!")
+                else:
+                    st.warning("No queries found in the Excel sheet.")
+            except Exception as e:
+                st.error(f"Error parsing Excel: {e}")
 
-    # Terms List
-    st.markdown("### Active Terms List")
-    if st.session_state.terms:
-        # Clear list button
-        if st.button("🗑️ Clear All Terms"):
-            st.session_state.terms = []
-            st.rerun()
+        # Text Area editor
+        terms_text = st.text_area(
+            "Queries (one per line):", 
+            value=st.session_state.terms_input,
+            height=250,
+            help="Type, paste, or edit search terms directly here. Every line is treated as a separate search query."
+        )
+        
+        # Sync back to state
+        st.session_state.terms_input = terms_text
+        active_terms = [t.strip() for t in terms_text.split("\n") if t.strip()]
 
-        for idx, term in enumerate(st.session_state.terms):
-            col_t_text, col_t_del = st.columns([4, 1])
-            col_t_text.markdown(f"**{idx + 1}.** `{term}`")
-            if col_t_del.button("❌", key=f"del_{idx}"):
-                st.session_state.terms.pop(idx)
-                st.rerun()
-    else:
-        st.info("No active search terms. Type one above or upload an Excel sheet.")
-
-# --- Right Column: Capture Dashboard ---
+# --- Right Column: Running & Outputs ---
 with col_right:
     st.subheader("🚀 Automation Dashboard")
     
-    # Run Buttons
-    col_run_1, col_run_2 = st.columns([1, 1])
-    start_btn = col_run_1.button("▶️ Start Capture Job", disabled=st.session_state.is_running or not st.session_state.terms, use_container_width=True, type="primary")
+    # KPI metrics dashboard
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Total Queries", len(active_terms))
+    m2.metric("Captured Items", len(st.session_state.outputs))
+    m3.metric("Status", "Running ⚡" if st.session_state.is_running else "Idle 💤")
 
-    
-    # Progress Indicators
+    # Start button (Uses type="primary" which triggers the gradient override)
+    st.markdown("<br>", unsafe_allow_html=True)
+    start_btn = st.button("▶️ Start Capture Job", disabled=st.session_state.is_running or not active_terms, type="primary", use_container_width=True)
+
     progress_bar = st.progress(0)
     progress_text = st.empty()
-    
-    # Log box container
+
+    # Log viewer
     st.markdown("### 📋 Activity Logs")
     logs_container = st.empty()
-    
-    # Gallery Output Sections
-    st.markdown("### 🖼️ Generated Outputs")
-    output_tabs = st.tabs(["Screenshots", "PDF Documents"])
-    
+    if st.session_state.logs:
+        logs_container.code("\n".join(st.session_state.logs))
+    else:
+        logs_container.info("No active log history. Start a job to see real-time updates.")
+
+    # Captured Tab Panels
+    st.markdown("### 🖼️ Export Gallery")
+    output_tabs = st.tabs(["Screenshots", "PDF Documents", "ZIP Package"])
+
+    # ZIP TAB
+    with output_tabs[2]:
+        if "zip_path" in st.session_state and os.path.exists(st.session_state.zip_path):
+            with open(st.session_state.zip_path, "rb") as f:
+                st.download_button(
+                    label="📥 Download All Results (ZIP)",
+                    data=f,
+                    file_name=st.session_state.zip_name,
+                    mime="application/zip",
+                    use_container_width=True
+                )
+        else:
+            st.info("Outputs zip file will be generated here once the job completes successfully.")
+
     # Run Job Process
     if start_btn:
         st.session_state.is_running = True
@@ -374,7 +250,7 @@ with col_right:
         logs_container.code("\n".join(st.session_state.logs))
         
         width, height = map(int, viewport.split('x'))
-        total_terms = len(st.session_state.terms)
+        total_terms = len(active_terms)
         
         try:
             with sync_playwright() as p:
@@ -394,7 +270,7 @@ with col_right:
                     }
                 )
                 
-                # navigator footprint mask
+                # navigator webdriver footprint mask
                 context.add_init_script("""
                     Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
                     window.navigator.chrome = { runtime: {}, loadTimes: () => {}, csi: () => {}, app: {} };
@@ -402,7 +278,7 @@ with col_right:
                 
                 page = context.new_page()
                 
-                for idx, term in enumerate(st.session_state.terms):
+                for idx, term in enumerate(active_terms):
                     progress_percent = int(((idx) / total_terms) * 100)
                     progress_bar.progress(progress_percent)
                     progress_text.text(f"Processing term {idx + 1} of {total_terms}: '{term}'")
@@ -477,7 +353,7 @@ with col_right:
                 st.session_state.zip_name = zip_filename
                 
                 progress_bar.progress(100)
-                progress_text.text("Finished processing all search terms!")
+                progress_text.text("Finished processing all search queries!")
                 append_log("Job completed successfully. ZIP file is ready for download.", "success")
                 logs_container.code("\n".join(st.session_state.logs))
                 
@@ -488,29 +364,14 @@ with col_right:
         st.session_state.is_running = False
         st.rerun()
 
-    # Render Active Logs
-    if st.session_state.logs:
-        logs_container.code("\n".join(st.session_state.logs))
-
-    # ZIP Download Button
-    if "zip_path" in st.session_state and os.path.exists(st.session_state.zip_path):
-        with open(st.session_state.zip_path, "rb") as f:
-            st.download_button(
-                label="📥 Download All Results (ZIP)",
-                data=f,
-                file_name=st.session_state.zip_name,
-                mime="application/zip",
-                use_container_width=True
-            )
-
-    # Render gallery items in tabs
+    # RENDER SCREENSHOT TAB
     with output_tabs[0]:
         screenshots = [o for o in st.session_state.outputs if o["type"] == "screenshot"]
         if screenshots:
             # Display grid
-            cols_gal = st.columns(3)
+            cols_gal = st.columns(2)
             for s_idx, s in enumerate(screenshots):
-                col_gal = cols_gal[s_idx % 3]
+                col_gal = cols_gal[s_idx % 2]
                 if os.path.exists(s["path"]):
                     col_gal.image(s["path"], caption=f"{s['term']}")
                     with open(s["path"], "rb") as sf:
@@ -522,14 +383,15 @@ with col_right:
                             key=f"dl_img_{s_idx}"
                         )
         else:
-            st.info("No screenshots generated yet.")
-            
+            st.info("No screenshots generated yet. Start a capture job.")
+
+    # RENDER PDF TAB
     with output_tabs[1]:
         pdfs = [o for o in st.session_state.outputs if o["type"] == "pdf"]
         if pdfs:
             for p_idx, p in enumerate(pdfs):
                 if os.path.exists(p["path"]):
-                    col_pdf_name, col_pdf_dl = st.columns([4, 1])
+                    col_pdf_name, col_pdf_dl = st.columns([3, 1])
                     col_pdf_name.markdown(f"📄 **{p['term']}** — `{p['name']}`")
                     with open(p["path"], "rb") as pf:
                         col_pdf_dl.download_button(
@@ -540,4 +402,4 @@ with col_right:
                             key=f"dl_pdf_{p_idx}"
                         )
         else:
-            st.info("No PDF files generated yet.")
+            st.info("No PDF files generated yet. Start a capture job.")
