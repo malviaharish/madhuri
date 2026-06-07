@@ -8,7 +8,13 @@ import shutil
 import datetime
 from openpyxl import load_workbook
 from playwright.sync_api import sync_playwright
-from playwright_stealth import stealth
+# Try importing playwright-stealth with a fail-safe fallback
+try:
+    from playwright_stealth import stealth
+    HAS_STEALTH = True
+except Exception:
+    HAS_STEALTH = False
+
 
 
 # 1. Page Config (Must be first)
@@ -293,10 +299,14 @@ with col_right:
                 # Apply stealth masking (removes webdriver footprint)
                 page = context.new_page()
                 try:
-                    stealth(page)
-                    append_log("Stealth browser mask applied successfully", "info")
+                    if HAS_STEALTH:
+                        stealth(page)
+                        append_log("Stealth browser mask applied successfully", "info")
+                    else:
+                        append_log("Notice: Stealth browser mask skipped (missing dependencies)", "warning")
                 except Exception as se:
                     append_log(f"Notice: Stealth browser mask failed: {se}", "warning")
+
 
                 
                 for idx, term in enumerate(active_terms):
