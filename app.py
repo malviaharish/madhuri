@@ -272,6 +272,12 @@ with col_right:
                     args=["--disable-blink-features=AutomationControlled"]
                 )
                 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                
+                # Configure proxy if provided
+                proxy_config = None
+                if "proxy_url" in st.session_state and st.session_state.proxy_url.strip():
+                    proxy_config = {"server": st.session_state.proxy_url.strip()}
+                
                 context = browser.new_context(
                     viewport={"width": width, "height": height},
                     user_agent=user_agent,
@@ -280,16 +286,18 @@ with col_right:
                     extra_http_headers={
                         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                         "Accept-Language": "en-US,en;q=0.9",
-                    }
+                    },
+                    proxy=proxy_config
                 )
                 
-                # navigator webdriver footprint mask
-                context.add_init_script("""
-                    Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-                    window.navigator.chrome = { runtime: {}, loadTimes: () => {}, csi: () => {}, app: {} };
-                """)
-                
+                # Apply stealth masking (removes webdriver footprint)
                 page = context.new_page()
+                try:
+                    stealth(page)
+                    append_log("Stealth browser mask applied successfully", "info")
+                except Exception as se:
+                    append_log(f"Notice: Stealth browser mask failed: {se}", "warning")
+
                 
                 for idx, term in enumerate(active_terms):
                     progress_percent = int(((idx) / total_terms) * 100)
